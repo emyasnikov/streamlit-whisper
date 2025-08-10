@@ -2,11 +2,11 @@ import streamlit as st
 
 
 class App:
+    audio = None
+
     def run(self):
         st.title("Streamlit Whisper")
-        audio_value = st.audio_input("Record a voice message")
-        if audio_value:
-            st.audio(audio_value)
+        self.audio = st.audio_input("Record audio", label_visibility="hidden")
 
 
 if __name__ == "__main__":
