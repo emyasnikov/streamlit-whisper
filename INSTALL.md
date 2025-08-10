@@ -8,10 +8,10 @@
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-#### Python
+#### Packages
 
 ```bash
-brew install python3.12
+brew install ffmpeg python3.12
 ```
 
 ## Python
