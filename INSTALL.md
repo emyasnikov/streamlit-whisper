@@ -23,6 +23,13 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
+### VSCode
+
+For ease of use the environment can optionally be selected for all new terminal windows as default:
+* Press Shift+Command+P for commands
+* Then search for "Python: Select Interpreter"
+* And choose recently created, mostly named "Python ... (.venv) ./venv/bin/python Recommended"
+
 ### Packages
 
 ```bash
