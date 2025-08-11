@@ -13,7 +13,7 @@ class Whisper:
             tmp.write(file.read())
             return tmp.name
 
-    def transcribe(self, audio):
-        file = self.temp_file(audio)
+    def transcribe(self, input):
+        file = self.temp_file(input)
         result = self.model.transcribe(file)
         return result["text"]
