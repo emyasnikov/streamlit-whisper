@@ -35,3 +35,9 @@ For ease of use the environment can optionally be selected for all new terminal 
 ```bash
 pip install -r requirements.txt
 ```
+
+## Run
+
+```bash
+streamlit run app.py
+```
