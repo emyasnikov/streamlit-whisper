@@ -13,14 +13,17 @@ class App:
 
     def run(self):
         st.title("Streamlit Whisper")
-        self.audio = st.audio_input("Record audio", label_visibility="hidden")
-        if self.audio is not None:
-            self.text = self.stt.transcribe(self.audio)
-            st.text(self.text)
-        self.file = st.file_uploader("Upload file", label_visibility="hidden")
-        if self.file is not None:
-            self.text = self.stt.transcribe(self.file)
-            st.text(self.text)
+        audio_tab, upload_tab = st.tabs(["Audio", "Upload"])
+        with audio_tab:
+            self.audio = st.audio_input("Record audio", label_visibility="hidden")
+            if self.audio is not None:
+                self.text = self.stt.transcribe(self.audio)
+                st.text(self.text)
+        with upload_tab:
+            self.file = st.file_uploader("Upload file", label_visibility="hidden")
+            if self.file is not None:
+                self.text = self.stt.transcribe(self.file)
+                st.text(self.text)
 
 
 if __name__ == "__main__":
