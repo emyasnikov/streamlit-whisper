@@ -14,6 +14,12 @@
 brew install ffmpeg python3.12
 ```
 
+### Ollama
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
 ## Python
 
 ### Environment
