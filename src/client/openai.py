@@ -1,8 +1,9 @@
 from ..config import Config
+from .client import Client
 from openai import OpenAI
 
 
-class ClassOpenAI():
+class ClassOpenAI(Client):
     def __init__(self):
         self.config = Config().get_config()
         self.client = OpenAI(

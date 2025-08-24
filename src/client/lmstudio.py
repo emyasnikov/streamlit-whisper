@@ -1,8 +1,9 @@
 from ..config import Config
+from .client import Client
 from openai import OpenAI
 
 
-class ClientLMStudio():
+class ClientLMStudio(Client):
     def __init__(self):
         self.config = Config().get_config()
         self.model = self.config["lmstudio"]["model"]
