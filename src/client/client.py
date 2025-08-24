@@ -5,7 +5,10 @@ class Client:
     def __init__(self):
         config = Config().get_config()
         client = config["client"]
-        if client == "lmstudio":
+        if client == "groq":
+            from .groq import ClientGroq
+            self.__class__ = ClientGroq
+        elif client == "lmstudio":
             from .lmstudio import ClientLMStudio
             self.__class__ = ClientLMStudio
         elif client == "ollama":
