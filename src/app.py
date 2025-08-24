@@ -1,7 +1,7 @@
 import streamlit as st
 
-from src.config import Config
-from src.stt import Whisper
+from .config import Config
+from .stt import Whisper
 
 
 class App:
