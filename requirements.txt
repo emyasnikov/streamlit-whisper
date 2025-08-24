@@ -1,4 +1,5 @@
 ollama
+openai
 openai-whisper
 pyyaml
 streamlit
