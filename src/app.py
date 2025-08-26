@@ -79,6 +79,14 @@ class App:
             "openai_api_key": openai_api_key,
         }
 
+    def _transcribe(self, input):
+        with st.status("Transcribing ..."):
+            st.write(f"Transcription using: {self.config["model"]}")
+            self.text = self.stt.transcribe(input)
+            st.write("Transcription complete")
+        st.header("Transcription")
+        st.text(self.text)
+
     def run(self):
         st.title("Streamlit Whisper")
         st.session_state["settings"] = self._sidebar_settings(self.config)
@@ -86,13 +94,11 @@ class App:
         with audio_tab:
             self.audio = st.audio_input("Record audio", label_visibility="hidden")
             if self.audio is not None:
-                self.text = self.stt.transcribe(self.audio)
-                st.text(self.text)
+                self._transcribe(self.audio)
         with upload_tab:
             self.file = st.file_uploader("Upload file", label_visibility="hidden")
             if self.file is not None:
-                self.text = self.stt.transcribe(self.file)
-                st.text(self.text)
+                self._transcribe(self.file)
 
 
 if __name__ == "__main__":
