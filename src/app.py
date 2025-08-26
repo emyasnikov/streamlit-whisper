@@ -6,12 +6,24 @@ from stt import Whisper
 
 
 class App:
-
     def __init__(self):
         self.client = Client()
         self.config = Config().get_config()
         self.stt = Whisper()
 
+    def _chat(self, input):
+        messages = [{
+            "role": "user",
+            "content": input,
+        }]
+
+        message = ""
+        response = self.client.chat(messages=messages, stream=True)
+
+        for part in response:
+            content = part["message"]["content"]
+            message += content
+            yield content
 
     def _sidebar_settings(self, config):
         st.sidebar.header("Settings")
@@ -79,13 +91,17 @@ class App:
             "openai_api_key": openai_api_key,
         }
 
+    def _summarize(self, input):
+        st.header("Summary")
+        st.write_stream(self._chat("Summarize following text: " + input))
+
     def _transcribe(self, input):
+        st.header("Transcription")
         with st.status("Transcribing ..."):
             st.write(f"Transcription using: {self.config["model"]}")
-            self.text = self.stt.transcribe(input)
+            self.transcription = self.stt.transcribe(input)
             st.write("Transcription complete")
-        st.header("Transcription")
-        st.text(self.text)
+        st.text(self.transcription)
 
     def run(self):
         st.title("Streamlit Whisper")
@@ -95,10 +111,12 @@ class App:
             self.audio = st.audio_input("Record audio", label_visibility="hidden")
             if self.audio is not None:
                 self._transcribe(self.audio)
+                self._summarize(self.transcription)
         with upload_tab:
             self.file = st.file_uploader("Upload file", label_visibility="hidden")
             if self.file is not None:
                 self._transcribe(self.file)
+                self._summarize(self.transcription)
 
 
 if __name__ == "__main__":
