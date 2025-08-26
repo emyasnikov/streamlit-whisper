@@ -1,7 +1,7 @@
 import tempfile
 import whisper
 
-from .config import Config
+from config import Config
 
 
 class Whisper:

@@ -1,7 +1,7 @@
 import ollama
 
-from ..config import Config
-from .client import Client
+from client.client import Client
+from config import Config
 
 
 class ClientOllama(Client):

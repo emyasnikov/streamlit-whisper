@@ -1,4 +1,4 @@
-from ..config import Config
+from config import Config
 
 
 class Client:
@@ -6,16 +6,16 @@ class Client:
         config = Config().get_config()
         client = config["client"]
         if client == "groq":
-            from .groq import ClientGroq
+            from client.groq import ClientGroq
             self.__class__ = ClientGroq
         elif client == "lmstudio":
-            from .lmstudio import ClientLMStudio
+            from client.lmstudio import ClientLMStudio
             self.__class__ = ClientLMStudio
         elif client == "ollama":
-            from .ollama import ClientOllama
+            from client.ollama import ClientOllama
             self.__class__ = ClientOllama
         elif client == "openai":
-            from .openai import ClientOpenAI
+            from client.openai import ClientOpenAI
             self.__class__ = ClientOpenAI
         else:
             raise ValueError(f"Invalid client: {client}")

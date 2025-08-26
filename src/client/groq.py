@@ -1,5 +1,5 @@
-from ..config import Config
-from .client import Client
+from client.client import Client
+from config import Config
 from openai import OpenAI
 
 

@@ -1,15 +1,13 @@
 import streamlit as st
 
-from .config import Config
-from .stt import Whisper
+from client.client import Client
+from stt import Whisper
 
 
 class App:
-    audio = None
-    config = None
 
     def __init__(self):
-        self.config = Config().get_config()
+        self.client = Client()
         self.stt = Whisper()
 
     def run(self):
