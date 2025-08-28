@@ -97,11 +97,11 @@ class App:
 
     def _transcribe(self):
         st.header("Transcription")
-        with st.status("Transcribing ..."):
-            st.write(f"Transcription using: {self.config["model"]}")
+        with st.status("Transcribing ...") as status:
             self.transcription = self.stt.transcribe(self.input)
-            st.text_area("Transcription", self.transcription)
-            st.write("Transcription complete")
+            st.text(f"Model: {self.config["model"]}")
+            st.text_area("Output", self.transcription)
+            status.update(label="Transcription complete", state="complete")
 
     def run(self):
         st.title("Streamlit Whisper")
