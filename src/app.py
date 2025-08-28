@@ -11,7 +11,7 @@ class App:
         self.config = Config().get_config()
         self.stt = Whisper()
 
-    def _chat(self, input):
+    def _chat_message(self, input):
         messages = [{
             "role": "user",
             "content": input,
@@ -91,15 +91,15 @@ class App:
             "openai_api_key": openai_api_key,
         }
 
-    def _summarize(self, input):
+    def _summarize(self):
         st.header("Summary")
-        st.write_stream(self._chat("Summarize following text: " + input))
+        st.write_stream(self._chat_message("Summarize following text: " + self.transcription))
 
-    def _transcribe(self, input):
+    def _transcribe(self):
         st.header("Transcription")
         with st.status("Transcribing ..."):
             st.write(f"Transcription using: {self.config["model"]}")
-            self.transcription = self.stt.transcribe(input)
+            self.transcription = self.stt.transcribe(self.input)
             st.text_area("Transcription", self.transcription)
             st.write("Transcription complete")
 
@@ -108,15 +108,15 @@ class App:
         st.session_state["settings"] = self._sidebar_settings(self.config)
         audio_tab, upload_tab = st.tabs(["Audio", "Upload"])
         with audio_tab:
-            self.audio = st.audio_input("Record audio", label_visibility="hidden")
-            if self.audio is not None:
-                self._transcribe(self.audio)
-                self._summarize(self.transcription)
+            self.input = st.audio_input("Record audio", label_visibility="hidden")
+            if self.input is not None:
+                self._transcribe()
+                self._summarize()
         with upload_tab:
-            self.file = st.file_uploader("Upload file", label_visibility="hidden")
-            if self.file is not None:
-                self._transcribe(self.file)
-                self._summarize(self.transcription)
+            self.input = st.file_uploader("Upload file", label_visibility="hidden")
+            if self.input is not None:
+                self._transcribe()
+                self._summarize()
 
 
 if __name__ == "__main__":
