@@ -95,6 +95,10 @@ class App:
         st.header("Summary")
         st.write_stream(self._chat_message("Summarize following text: " + self.transcription))
 
+    def _tasks(self):
+        st.header("Tasks")
+        st.write_stream(self._chat_message("Extract tasks from the text: " + self.transcription))
+
     def _transcribe(self):
         st.header("Transcription")
         with st.status("Transcribing ...") as status:
@@ -112,11 +116,13 @@ class App:
             if self.input is not None:
                 self._transcribe()
                 self._summarize()
+                self._tasks()
         with upload_tab:
             self.input = st.file_uploader("Upload file", label_visibility="hidden")
             if self.input is not None:
                 self._transcribe()
                 self._summarize()
+                self._tasks()
 
 
 if __name__ == "__main__":
