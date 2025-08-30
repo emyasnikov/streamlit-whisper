@@ -46,7 +46,7 @@ class App:
             self._tasks()
             status.update(label="Complete", state="complete")
 
-    def _sidebar_settings(self, config):
+    def _sidebar_settings(self):
         st.sidebar.header("Settings")
         client = st.sidebar.selectbox(
             "Client",
@@ -61,7 +61,7 @@ class App:
                 "lmstudio",
                 "ollama",
                 "openai",
-            ].index(config["client"] or "ollama"),
+            ].index(self.config["client"] or "ollama"),
         )
         language = st.sidebar.selectbox(
             "Language",
@@ -71,11 +71,11 @@ class App:
             ], index=[
                 "english",
                 "german",
-            ].index(config["language"] or "german"),
+            ].index(self.config["language"] or "german"),
         )
         model = st.sidebar.text_input(
             "Whisper Modell",
-            value=config["model"] or "base",
+            value=self.config["model"] or "base",
         ),
         speaker_recognition = st.sidebar.checkbox(
             "Speaker recognition",
@@ -91,23 +91,23 @@ class App:
             max_value=1.0,
             min_value=0.0,
             step=0.05,
-            value=float(config["groq"]["temperature"] or 0.7),
+            value=float(self.config["groq"]["temperature"] or 0.7),
         )
         groq_api_key = st.sidebar.text_input(
             "Groq API Key",
             type="password",
-            value=config["groq"]["api_key"] or "",
+            value=self.config["groq"]["api_key"] or "",
         )
         openai_api_key = st.sidebar.text_input(
             "OpenAI API Key",
-            value=config["openai"]["api_key"] or "",
+            value=self.config["openai"]["api_key"] or "",
         )
         pyannote_token = None
         if speaker_recognition:
             pyannote_token = st.sidebar.text_input(
                 "pyannote API Token",
                 type="password",
-                value=config["huggingface"]["pyannote"]["token"] or "",
+                value=self.config["huggingface"]["pyannote"]["token"] or "",
                 help="HuggingFace API token for pyannote.audio pipeline"
             )
         return {
@@ -163,7 +163,7 @@ class App:
 
     def run(self):
         st.title("Streamlit Whisper")
-        st.session_state["settings"] = self._sidebar_settings(self.config)
+        st.session_state["settings"] = self._sidebar_settings()
         self.settings = st.session_state.get("settings", {})
         audio_tab, upload_tab = st.tabs(["Audio", "Upload"])
         with audio_tab:
