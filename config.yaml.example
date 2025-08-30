@@ -19,3 +19,4 @@ ollama:
 openai:
     api_key:
     model:
+summarize: true

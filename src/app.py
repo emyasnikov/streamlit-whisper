@@ -84,7 +84,7 @@ class App:
         )
         summary = st.sidebar.checkbox(
             "Summary generation",
-            value=False,
+            value=self.config["summarize"] or False,
         )
         temperature = st.sidebar.slider(
             "Temperature",
