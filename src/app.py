@@ -1,7 +1,9 @@
 import streamlit as st
+import torch
 
 from client.client import Client
 from config import Config
+from pyannote.audio import Pipeline as PyannotePipeline
 from stt import Whisper
 
 
@@ -10,6 +12,9 @@ class App:
         self.client = Client()
         self.config = Config().get_config()
         self.stt = Whisper()
+        self.pyannote_pipeline = None
+        self.speaker_map = None
+        self.transcription = ""
 
     def _chat_message(self, input):
         messages = [{
@@ -59,6 +64,7 @@ class App:
         speaker_recognition = st.sidebar.checkbox(
             "Speaker recognition",
             value=False,
+            help="Separate transcript by speakers using pyannote.audio (requires model and API token)"
         )
         summary = st.sidebar.checkbox(
             "Summary generation",
@@ -80,6 +86,14 @@ class App:
             "OpenAI API Key",
             value=config["openai"]["api_key"] or "",
         )
+        pyannote_token = None
+        if speaker_recognition:
+            pyannote_token = st.sidebar.text_input(
+                "pyannote API Token",
+                type="password",
+                value=config["huggingface"]["pyannote"]["token"] or "",
+                help="HuggingFace API token for pyannote.audio pipeline"
+            )
         return {
             "client": client,
             "language": language,
@@ -89,6 +103,7 @@ class App:
             "temperature": temperature,
             "groq_api_key": groq_api_key,
             "openai_api_key": openai_api_key,
+            "pyannote_token": pyannote_token,
         }
 
     def _summarize(self):
@@ -101,9 +116,28 @@ class App:
 
     def _transcribe(self):
         st.header("Transcription")
+        settings = st.session_state.get("settings", {})
+        speaker_recognition = settings.get("speaker_recognition", False)
+        pyannote_token = settings.get("pyannote_token")
         with st.status("Transcribing ...") as status:
+            st.text(f"Transcription with: {self.config['model']}")
             self.transcription = self.stt.transcribe(self.input)
-            st.text(f"Model: {self.config["model"]}")
+            if speaker_recognition:
+                if not pyannote_token:
+                    st.warning("HuggingFace API token is missing.")
+                else:
+                    st.text(f"Speaker diarisation ...")
+                    try:
+                        self.pyannote_pipeline = PyannotePipeline.from_pretrained(
+                            "pyannote/speaker-diarization-3.1",
+                            use_auth_token=pyannote_token,
+                        )
+                        self.pyannote_pipeline.to(torch.device("cpu"))
+                        diarization = self.pyannote_pipeline(self.input)
+                        for turn, _, speaker in diarization.itertracks(yield_label=True):
+                            st.write(f"start={turn.start:.1f}s stop={turn.end:.1f}s speaker={speaker}")
+                    except Exception as e:
+                        st.error(f"Speaker diarization failed: {e}")
             st.text_area("Output", self.transcription)
             status.update(label="Transcription complete", state="complete")
 

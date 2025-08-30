@@ -1,5 +1,8 @@
 ollama
 openai
 openai-whisper
+pyannote.audio
 pyyaml
 streamlit
+torch
+torchaudio
