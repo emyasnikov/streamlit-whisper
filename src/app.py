@@ -36,6 +36,15 @@ class App:
         overlap = max(0, earliest_end - latest_start)
         return overlap
 
+    def _run_with_status(self):
+        with st.status("") as status:
+            status.update(label="Transcription ...", expanded=True, state="running")
+            self._transcribe()
+            status.update(label="Summary ...")
+            self._summarize()
+            status.update(label="Tasks ...")
+            self._tasks()
+            status.update(label="Complete", state="complete")
 
     def _sidebar_settings(self, config):
         st.sidebar.header("Settings")
@@ -122,56 +131,49 @@ class App:
         st.write_stream(self._chat_message("Extract tasks from the text: " + self.transcription))
 
     def _transcribe(self):
-        st.header("Transcription")
-        settings = st.session_state.get("settings", {})
-        speaker_recognition = settings.get("speaker_recognition", False)
-        pyannote_token = settings.get("pyannote_token")
-        with st.status("Transcribing ...") as status:
-            st.text(f"Transcription with: {self.config['model']}")
-            self.transcription, self.segments = self.stt.transcribe(self.input)
-            if speaker_recognition:
-                if not pyannote_token:
-                    st.warning("HuggingFace API token is missing.")
-                else:
-                    st.text(f"Speaker diarisation ...")
-                    try:
-                        self.pyannote_pipeline = PyannotePipeline.from_pretrained(
-                            "pyannote/speaker-diarization-3.1",
-                            use_auth_token=pyannote_token,
-                        )
-                        self.pyannote_pipeline.to(torch.device("cpu"))
-                        diarization = self.pyannote_pipeline(self.input)
-                        for segment in self.segments:
-                            matching_speaker = None
-                            max_overlap = 0
-                            for turn, _, speaker in diarization.itertracks(yield_label=True):
-                                overlap = self._compute_overlap([segment['start'], segment['end']], [turn.start, turn.end])
-                                if overlap > max_overlap:
-                                    max_overlap = overlap
-                                    matching_speaker = speaker
-                            st.write(f"{matching_speaker}: {segment['text']}")
-                            st.write(f"start={turn.start:.1f}s stop={turn.end:.1f}s speaker={speaker}")
-                    except Exception as e:
-                        st.error(f"Speaker diarization failed: {e}")
-            st.text_area("Output", self.transcription)
-            status.update(label="Transcription complete", state="complete")
+        speaker_recognition = self.settings.get("speaker_recognition", False)
+        pyannote_token = self.settings.get("pyannote_token")
+        st.text(f"Transcription with: {self.config['model']}")
+        self.transcription, self.segments = self.stt.transcribe(self.input)
+        if speaker_recognition:
+            if not pyannote_token:
+                st.warning("HuggingFace API token is missing.")
+            else:
+                st.text(f"Speaker diarisation ...")
+                try:
+                    self.pyannote_pipeline = PyannotePipeline.from_pretrained(
+                        "pyannote/speaker-diarization-3.1",
+                        use_auth_token=pyannote_token,
+                    )
+                    self.pyannote_pipeline.to(torch.device("cpu"))
+                    diarization = self.pyannote_pipeline(self.input)
+                    for segment in self.segments:
+                        matching_speaker = None
+                        max_overlap = 0
+                        for turn, _, speaker in diarization.itertracks(yield_label=True):
+                            overlap = self._compute_overlap([segment['start'], segment['end']], [turn.start, turn.end])
+                            if overlap > max_overlap:
+                                max_overlap = overlap
+                                matching_speaker = speaker
+                        st.write(f"{matching_speaker}: {segment['text']}")
+                        st.write(f"start={turn.start:.1f}s stop={turn.end:.1f}s speaker={speaker}")
+                except Exception as e:
+                    st.error(f"Speaker diarization failed: {e}")
+        st.text_area("Output", self.transcription)
 
     def run(self):
         st.title("Streamlit Whisper")
         st.session_state["settings"] = self._sidebar_settings(self.config)
+        self.settings = st.session_state.get("settings", {})
         audio_tab, upload_tab = st.tabs(["Audio", "Upload"])
         with audio_tab:
             self.input = st.audio_input("Record audio", label_visibility="hidden")
             if self.input is not None:
-                self._transcribe()
-                self._summarize()
-                self._tasks()
+                self._run_with_status()
         with upload_tab:
             self.input = st.file_uploader("Upload file", label_visibility="hidden")
             if self.input is not None:
-                self._transcribe()
-                self._summarize()
-                self._tasks()
+                self._run_with_status()
 
 
 if __name__ == "__main__":
