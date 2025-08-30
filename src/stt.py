@@ -17,4 +17,4 @@ class Whisper:
     def transcribe(self, input):
         file = self.temp_file(input)
         result = self.model.transcribe(file, language=self.config["language"])
-        return result["text"]
+        return result["text"], result["segments"]
