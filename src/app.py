@@ -30,12 +30,6 @@ class App:
             message += content
             yield content
 
-    def _compute_overlap(interval1, interval2):
-        latest_start = max(interval1, interval2)
-        earliest_end = min(interval1[13], interval2[13])
-        overlap = max(0, earliest_end - latest_start)
-        return overlap
-
     def _run_with_status(self):
         with st.status("") as status:
             status.update(label="Transcription ...", expanded=True, state="running")
@@ -135,7 +129,6 @@ class App:
     def _transcribe(self):
         pyannote_token = self.settings.get("pyannote_token")
         st.text(f"Transcription with: {self.config['model']}")
-        self.transcription, self.segments = self.stt.transcribe(self.input)
         if self.settings.get("speaker_recognition", False):
             if not pyannote_token:
                 st.warning("HuggingFace API token is missing.")
@@ -148,15 +141,7 @@ class App:
                     )
                     self.pyannote_pipeline.to(torch.device("cpu"))
                     diarization = self.pyannote_pipeline(self.input)
-                    for segment in self.segments:
-                        matching_speaker = None
-                        max_overlap = 0
-                        for turn, _, speaker in diarization.itertracks(yield_label=True):
-                            overlap = self._compute_overlap([segment['start'], segment['end']], [turn.start, turn.end])
-                            if overlap > max_overlap:
-                                max_overlap = overlap
-                                matching_speaker = speaker
-                        st.write(f"{matching_speaker}: {segment['text']}")
+                    for turn, _, speaker in diarization.itertracks(yield_label=True):
                         st.write(f"start={turn.start:.1f}s stop={turn.end:.1f}s speaker={speaker}")
                 except Exception as e:
                     st.error(f"Speaker diarization failed: {e}")
