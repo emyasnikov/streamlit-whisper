@@ -123,19 +123,20 @@ class App:
         }
 
     def _summarize(self):
-        st.header("Summary")
-        st.write_stream(self._chat_message("Summarize following text: " + self.transcription))
+        if self.settings.get("summarize", False):
+            st.header("Summary")
+            st.write_stream(self._chat_message("Summarize following text: " + self.transcription))
 
     def _tasks(self):
-        st.header("Tasks")
-        st.write_stream(self._chat_message("Extract tasks from the text: " + self.transcription))
+        if self.settings.get("speaker_recognition", False):
+            st.header("Tasks")
+            st.write_stream(self._chat_message("Extract tasks from the text: " + self.transcription))
 
     def _transcribe(self):
-        speaker_recognition = self.settings.get("speaker_recognition", False)
         pyannote_token = self.settings.get("pyannote_token")
         st.text(f"Transcription with: {self.config['model']}")
         self.transcription, self.segments = self.stt.transcribe(self.input)
-        if speaker_recognition:
+        if self.settings.get("speaker_recognition", False):
             if not pyannote_token:
                 st.warning("HuggingFace API token is missing.")
             else:
