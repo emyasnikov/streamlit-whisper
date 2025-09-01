@@ -1,4 +1,5 @@
 import streamlit as st
+import tempfile
 import torch
 
 from client.client import Client
@@ -141,15 +142,18 @@ class App:
                         use_auth_token=pyannote_token,
                     )
                     self.pyannote_pipeline.to(torch.device("cpu"))
-                    diarization = self.pyannote_pipeline(self.input)
-                    audio = AudioSegment.from_file(self.input)
-                    for turn, _, speaker in diarization.itertracks(yield_label=True):
-                        segment_audio = audio[turn.start:turn.end]
-                        if turn.end - turn.start > 1:
+                    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_wav:
+                        audio = AudioSegment.from_file(self.input)
+                        audio = audio.set_frame_rate(16000).set_channels(1)
+                        audio.export(tmp_wav.name, format="wav")
+                        diarization = self.pyannote_pipeline(tmp_wav.name)
+                        for turn, _, speaker in diarization.itertracks(yield_label=True):
+                            segment_audio = audio[turn.start * 1000:turn.end * 1000]
                             segment_id = f"{turn.start:.1f}_{turn.end:.1f}_{speaker}"
-                            segment_audio.export(f"segment_{segment_id}.wav", format="wav")
+                            segment_path = f"segment_{segment_id}.wav"
+                            segment_audio.export(segment_path, format="wav")
                             st.write(f"start={turn.start:.1f}s stop={turn.end:.1f}s speaker={speaker}")
-                            st.write(self.stt.transcribe(f"segment_{segment_id}.wav"))
+                            st.write(self.stt.transcribe(segment_path))
 
                 except Exception as e:
                     st.error(f"{e}")
