@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import tempfile
 import torch
@@ -154,7 +155,8 @@ class App:
                             segment_audio.export(segment_path, format="wav")
                             st.write(f"start={turn.start:.1f}s stop={turn.end:.1f}s speaker={speaker}")
                             st.write(self.stt.transcribe(segment_path))
-
+                            if os.path.exists(segment_path):
+                                os.remove(segment_path)
                 except Exception as e:
                     st.error(f"{e}")
 
