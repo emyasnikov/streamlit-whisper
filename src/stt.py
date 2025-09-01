@@ -15,6 +15,10 @@ class Whisper:
             return tmp.name
 
     def transcribe(self, input):
-        file = self.temp_file(input)
-        result = self.model.transcribe(file, language=self.config["language"])
-        return result["text"], result["segments"]
+        if hasattr(input, "read"):
+            file_path = self.temp_file(input)
+        elif isinstance(input, str):
+            file_path = input
+        with open(file_path, "rb") as f:
+            result = self.model.transcribe(file_path, language=self.config["language"])
+        return result.get("text", "")
