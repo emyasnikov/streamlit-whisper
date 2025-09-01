@@ -4,6 +4,7 @@ import torch
 from client.client import Client
 from config import Config
 from pyannote.audio import Pipeline as PyannotePipeline
+from pydub import AudioSegment
 from stt import Whisper
 
 
@@ -141,11 +142,17 @@ class App:
                     )
                     self.pyannote_pipeline.to(torch.device("cpu"))
                     diarization = self.pyannote_pipeline(self.input)
+                    audio = AudioSegment.from_file(self.input)
                     for turn, _, speaker in diarization.itertracks(yield_label=True):
-                        st.write(f"start={turn.start:.1f}s stop={turn.end:.1f}s speaker={speaker}")
+                        segment_audio = audio[turn.start:turn.end]
+                        if turn.end - turn.start > 1:
+                            segment_id = f"{turn.start:.1f}_{turn.end:.1f}_{speaker}"
+                            segment_audio.export(f"segment_{segment_id}.wav", format="wav")
+                            st.write(f"start={turn.start:.1f}s stop={turn.end:.1f}s speaker={speaker}")
+                            st.write(self.stt.transcribe(f"segment_{segment_id}.wav"))
+
                 except Exception as e:
-                    st.error(f"Speaker diarization failed: {e}")
-        st.text_area("Output", self.transcription)
+                    st.error(f"{e}")
 
     def run(self):
         st.title("Streamlit Whisper")

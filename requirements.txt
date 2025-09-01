@@ -2,6 +2,7 @@ ollama
 openai
 openai-whisper
 pyannote.audio
+pydub
 pyyaml
 streamlit
 torch
