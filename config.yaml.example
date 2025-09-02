@@ -5,8 +5,7 @@ groq:
     model: openai/gpt-oss-20b
     temperature: 0.7
 huggingface:
-    pyannote:
-        token:
+    token:
 language: german
 lmstudio:
     api_key: lm-studio

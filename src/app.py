@@ -18,6 +18,7 @@ class App:
         self.pyannote_pipeline = None
         self.speaker_map = None
         self.transcription = ""
+        self.huggingface_token = ""
 
     def _chat_message(self, input):
         messages = [{
@@ -103,14 +104,12 @@ class App:
             "OpenAI API Key",
             value=self.config["openai"]["api_key"] or "",
         )
-        pyannote_token = None
-        if speaker_recognition:
-            pyannote_token = st.sidebar.text_input(
-                "pyannote API Token",
-                type="password",
-                value=self.config["huggingface"]["pyannote"]["token"] or "",
-                help="HuggingFace API token for pyannote.audio pipeline"
-            )
+        huggingface_token = st.sidebar.text_input(
+            "pyannote API Token",
+            type="password",
+            value=self.config["huggingface"]["token"] or "",
+            help="HuggingFace API token for pyannote.audio pipeline etc.",
+        )
         return {
             "client": client,
             "language": language,
@@ -120,13 +119,12 @@ class App:
             "temperature": temperature,
             "groq_api_key": groq_api_key,
             "openai_api_key": openai_api_key,
-            "pyannote_token": pyannote_token,
+            "huggingface_token": huggingface_token,
         }
 
     def _transcribe(self, status=None):
-        pyannote_token = self.settings.get("pyannote_token")
         if self.settings.get("speaker_recognition", False):
-            if not pyannote_token:
+            if not self.settings.get("huggingface_token"):
                 st.warning("HuggingFace API token is missing.")
             else:
                 try:
