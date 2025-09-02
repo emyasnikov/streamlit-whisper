@@ -125,7 +125,6 @@ class App:
 
     def _transcribe(self, status=None):
         pyannote_token = self.settings.get("pyannote_token")
-        st.text(f"Transcription with: {self.config['model']}")
         if self.settings.get("speaker_recognition", False):
             if not pyannote_token:
                 st.warning("HuggingFace API token is missing.")
