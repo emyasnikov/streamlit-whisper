@@ -152,8 +152,9 @@ class App:
                             segment_audio = audio[turn.start * 1000:turn.end * 1000]
                             segment_path = f"segment_{turn.start}.wav"
                             segment_audio.export(segment_path, format="wav")
-                            st.write(f"start={turn.start:.1f}s stop={turn.end:.1f}s speaker={speaker}")
-                            st.write(self.stt.transcribe(segment_path))
+                            with st.chat_message("user"):
+                                st.markdown(f"**{speaker}** - {turn.start:.1f}s")
+                                st.write(self.stt.transcribe(segment_path))
                             if os.path.exists(segment_path):
                                 os.remove(segment_path)
                 except Exception as e:
