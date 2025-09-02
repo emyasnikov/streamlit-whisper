@@ -34,6 +34,13 @@ class App:
             message += content
             yield content
 
+    def _init_pyannote(self):
+        self.pyannote_pipeline = PyannotePipeline.from_pretrained(
+            "pyannote/speaker-diarization-3.1",
+            use_auth_token=self.settings.get("huggingface_token"),
+        )
+        self.pyannote_pipeline.to(torch.device("cpu"))
+
     def _run_with_status(self):
         with st.status("") as status:
             status.update(label="Initialization ...", expanded=True, state="running")
@@ -128,12 +135,8 @@ class App:
                 st.warning("HuggingFace API token is missing.")
             else:
                 try:
+                    self._init_pyannote()
                     status.update(label="Speaker diarisation ...", expanded=True, state="running")
-                    self.pyannote_pipeline = PyannotePipeline.from_pretrained(
-                        "pyannote/speaker-diarization-3.1",
-                        use_auth_token=pyannote_token,
-                    )
-                    self.pyannote_pipeline.to(torch.device("cpu"))
                     status.update(label="Prepare files ...", expanded=True, state="running")
                     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_wav:
                         audio = AudioSegment.from_file(self.input)
