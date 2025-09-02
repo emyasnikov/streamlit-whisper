@@ -44,19 +44,20 @@ class App:
     def _run_with_status(self):
         with st.status("") as status:
             status.update(label="Initialization ...", expanded=True, state="running")
+            st.markdown("### Transcript")
             self._transcribe(status=status)
             if self.settings.get("summary_generation", False):
                 status.update(label="Summary ...", expanded=True, state="running")
-                st.header("Summary")
+                st.markdown("### Summary")
                 st.write_stream(self._chat_message("Summarize following text: " + self.transcription))
             if self.settings.get("summary_generation", False):
                 status.update(label="Tasks ...", expanded=True, state="running")
-                st.header("Tasks")
+                st.markdown("### Tasks")
                 st.write_stream(self._chat_message("Extract tasks from the text: " + self.transcription))
             status.update(label="Complete", expanded=True, state="complete")
 
     def _sidebar_settings(self):
-        st.sidebar.header("Settings")
+        st.sidebar.markdown("## Settings")
         client = st.sidebar.selectbox(
             "Client",
             [
