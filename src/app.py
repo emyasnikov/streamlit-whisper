@@ -150,8 +150,7 @@ class App:
                         diarization = self.pyannote_pipeline(tmp_wav.name)
                         for turn, _, speaker in diarization.itertracks(yield_label=True):
                             segment_audio = audio[turn.start * 1000:turn.end * 1000]
-                            segment_id = f"{turn.start:.1f}_{turn.end:.1f}_{speaker}"
-                            segment_path = f"segment_{segment_id}.wav"
+                            segment_path = f"segment_{turn.start}.wav"
                             segment_audio.export(segment_path, format="wav")
                             st.write(f"start={turn.start:.1f}s stop={turn.end:.1f}s speaker={speaker}")
                             st.write(self.stt.transcribe(segment_path))
