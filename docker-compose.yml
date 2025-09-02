@@ -1,0 +1,9 @@
+services:
+  streamlit-whisper:
+    build: .
+    container_name: streamlit-whisper
+    ports:
+      - "8501:8501"
+    environment:
+      PYTHONUNBUFFERED: 1
+    restart: unless-stopped
