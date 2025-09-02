@@ -37,10 +37,14 @@ class App:
         with st.status("") as status:
             status.update(label="Initialization ...", expanded=True, state="running")
             self._transcribe(status=status)
-            status.update(label="Summary ...", expanded=True, state="running")
-            self._summarize()
-            status.update(label="Tasks ...", expanded=True, state="running")
-            self._tasks()
+            if self.settings.get("summary_generation", False):
+                status.update(label="Summary ...", expanded=True, state="running")
+                st.header("Summary")
+                st.write_stream(self._chat_message("Summarize following text: " + self.transcription))
+            if self.settings.get("summary_generation", False):
+                status.update(label="Tasks ...", expanded=True, state="running")
+                st.header("Tasks")
+                st.write_stream(self._chat_message("Extract tasks from the text: " + self.transcription))
             status.update(label="Complete", expanded=True, state="complete")
 
     def _sidebar_settings(self):
@@ -118,16 +122,6 @@ class App:
             "openai_api_key": openai_api_key,
             "pyannote_token": pyannote_token,
         }
-
-    def _summarize(self):
-        if self.settings.get("summary_generation", False):
-            st.header("Summary")
-            st.write_stream(self._chat_message("Summarize following text: " + self.transcription))
-
-    def _tasks(self):
-        if self.settings.get("summary_generation", False):
-            st.header("Tasks")
-            st.write_stream(self._chat_message("Extract tasks from the text: " + self.transcription))
 
     def _transcribe(self, status=None):
         pyannote_token = self.settings.get("pyannote_token")
