@@ -35,13 +35,13 @@ class App:
 
     def _run_with_status(self):
         with st.status("") as status:
-            status.update(label="Transcription ...", expanded=True, state="running")
-            self._transcribe()
-            status.update(label="Summary ...")
+            status.update(label="Initialization ...", expanded=True, state="running")
+            self._transcribe(status=status)
+            status.update(label="Summary ...", expanded=True, state="running")
             self._summarize()
-            status.update(label="Tasks ...")
+            status.update(label="Tasks ...", expanded=True, state="running")
             self._tasks()
-            status.update(label="Complete", state="complete")
+            status.update(label="Complete", expanded=True, state="complete")
 
     def _sidebar_settings(self):
         st.sidebar.header("Settings")
@@ -129,25 +129,27 @@ class App:
             st.header("Tasks")
             st.write_stream(self._chat_message("Extract tasks from the text: " + self.transcription))
 
-    def _transcribe(self):
+    def _transcribe(self, status=None):
         pyannote_token = self.settings.get("pyannote_token")
         st.text(f"Transcription with: {self.config['model']}")
         if self.settings.get("speaker_recognition", False):
             if not pyannote_token:
                 st.warning("HuggingFace API token is missing.")
             else:
-                st.text(f"Speaker diarisation ...")
                 try:
+                    status.update(label="Speaker diarisation ...", expanded=True, state="running")
                     self.pyannote_pipeline = PyannotePipeline.from_pretrained(
                         "pyannote/speaker-diarization-3.1",
                         use_auth_token=pyannote_token,
                     )
                     self.pyannote_pipeline.to(torch.device("cpu"))
+                    status.update(label="Prepare files ...", expanded=True, state="running")
                     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_wav:
                         audio = AudioSegment.from_file(self.input)
                         audio = audio.set_frame_rate(16000).set_channels(1)
                         audio.export(tmp_wav.name, format="wav")
                         diarization = self.pyannote_pipeline(tmp_wav.name)
+                        status.update(label="Transcription ...", expanded=True, state="running")
                         for turn, _, speaker in diarization.itertracks(yield_label=True):
                             segment_audio = audio[turn.start * 1000:turn.end * 1000]
                             segment_path = f"segment_{turn.start}.wav"
