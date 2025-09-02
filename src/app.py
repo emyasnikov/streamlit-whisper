@@ -79,7 +79,7 @@ class App:
             value=False,
             help="Separate transcript by speakers using pyannote.audio (requires model and API token)"
         )
-        summary = st.sidebar.checkbox(
+        summary_generation = st.sidebar.checkbox(
             "Summary generation",
             value=self.config["summarize"] or False,
         )
@@ -112,7 +112,7 @@ class App:
             "language": language,
             "model": model,
             "speaker_recognition": speaker_recognition,
-            "summary": summary,
+            "summary_generation": summary_generation,
             "temperature": temperature,
             "groq_api_key": groq_api_key,
             "openai_api_key": openai_api_key,
@@ -120,12 +120,12 @@ class App:
         }
 
     def _summarize(self):
-        if self.settings.get("summarize", False):
+        if self.settings.get("summary_generation", False):
             st.header("Summary")
             st.write_stream(self._chat_message("Summarize following text: " + self.transcription))
 
     def _tasks(self):
-        if self.settings.get("speaker_recognition", False):
+        if self.settings.get("summary_generation", False):
             st.header("Tasks")
             st.write_stream(self._chat_message("Extract tasks from the text: " + self.transcription))
 
