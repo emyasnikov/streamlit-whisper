@@ -151,11 +151,16 @@ class App:
                             segment_audio.export(segment_path, format="wav")
                             with st.chat_message("user"):
                                 st.markdown(f"**{speaker}** - {turn.start:.1f}s")
-                                st.write(self.stt.transcribe(segment_path))
+                                segment = self.stt.transcribe(segment_path)
+                                self.transcription += segment
+                                st.write(segment)
                             if os.path.exists(segment_path):
                                 os.remove(segment_path)
                 except Exception as e:
                     st.error(f"{e}")
+        else:
+            self.transcription = self.stt.transcribe(self.input)
+            st.text_area(label="Transcript", value=self.transcription, label_visibility="collapsed")
 
     def run(self):
         st.title("Streamlit Whisper")
