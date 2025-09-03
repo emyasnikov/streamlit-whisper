@@ -5,5 +5,9 @@ services:
     ports:
       - "8501:8501"
     environment:
+      OLLAMA_HOST: host.docker.internal
       PYTHONUNBUFFERED: 1
     restart: unless-stopped
+    volumes:
+      - ./data:/app/data:rw
+      - ./cache:/root/.cache:rw
