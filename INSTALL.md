@@ -2,19 +2,25 @@
 
 ## Prerequisites
 
-### Homebrew
+### macOS
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-#### Packages
-
-```bash
 brew install ffmpeg python3.12
 ```
 
-### Ollama
+### Windows
+
+```cmd
+wsl --install
+```
+
+```bash
+sudo apt update
+sudo apt install ffmpeg python3.12
+```
+
+## Ollama
 
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh
