@@ -12,7 +12,6 @@ from stt import Whisper
 
 class App:
     def __init__(self):
-        self.client = Client()
         self.config = Config().get_config()
         self.stt = Whisper()
         self.pyannote_pipeline = None
@@ -166,6 +165,7 @@ class App:
         st.title("Streamlit Whisper")
         st.session_state["settings"] = self._sidebar_settings()
         self.settings = st.session_state.get("settings", {})
+        self.client = Client(self.settings["client"])
         audio_tab, upload_tab = st.tabs(["Audio", "Upload"])
         with audio_tab:
             self.input = st.audio_input("Record audio", label_visibility="hidden")

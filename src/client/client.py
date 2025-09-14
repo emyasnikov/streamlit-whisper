@@ -1,10 +1,5 @@
-from config import Config
-
-
 class Client:
-    def __init__(self):
-        config = Config().get_config()
-        client = config["client"]
+    def __init__(self, client):
         if client == "groq":
             from client.groq import ClientGroq
             self.__class__ = ClientGroq
