@@ -19,3 +19,7 @@ openai:
     api_key:
     model:
 summarize: true
+summary:
+    prompt: Summarize following text
+tasks:
+    prompt: Extract tasks from the text

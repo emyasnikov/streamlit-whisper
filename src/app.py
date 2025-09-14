@@ -47,11 +47,11 @@ class App:
             if self.settings.get("summary_generation", False):
                 status.update(label="Summary ...", expanded=True, state="running")
                 st.markdown("### Summary")
-                st.write_stream(self._chat_message("Summarize following text: " + self.transcription))
+                st.write_stream(self._chat_message(self.settings["prompt_summary"] + ": " + self.transcription))
             if self.settings.get("summary_generation", False):
                 status.update(label="Tasks ...", expanded=True, state="running")
                 st.markdown("### Tasks")
-                st.write_stream(self._chat_message("Extract tasks from the text: " + self.transcription))
+                st.write_stream(self._chat_message(self.settings["prompt_tasks"] + ": " + self.transcription))
             status.update(label="Complete", expanded=True, state="complete")
 
     def _sidebar_settings(self):
@@ -130,6 +130,14 @@ class App:
             value=self.config["huggingface"]["token"] or "",
             help="HuggingFace API token for pyannote.audio pipeline etc.",
         )
+        prompt_summary = st.sidebar.text_area(
+            "Prompt - Summary",
+            value=self.config["summary"]["prompt"] or "",
+        )
+        prompt_tasks = st.sidebar.text_area(
+            "Prompt - Tasks",
+            value=self.config["tasks"]["prompt"] or "",
+        )
         return {
             "client": client,
             "groq_api_key": groq_api_key,
@@ -137,6 +145,8 @@ class App:
             "language": language,
             "model": model,
             "openai_api_key": openai_api_key,
+            "prompt_summary": prompt_summary,
+            "prompt_tasks": prompt_tasks,
             "speaker_recognition": speaker_recognition,
             "summary_generation": summary_generation,
             "temperature": temperature,
