@@ -132,14 +132,14 @@ class App:
         )
         return {
             "client": client,
+            "groq_api_key": groq_api_key,
+            "huggingface_token": huggingface_token,
             "language": language,
             "model": model,
+            "openai_api_key": openai_api_key,
             "speaker_recognition": speaker_recognition,
             "summary_generation": summary_generation,
             "temperature": temperature,
-            "groq_api_key": groq_api_key,
-            "openai_api_key": openai_api_key,
-            "huggingface_token": huggingface_token,
         }
 
     def _transcribe(self, status=None):
