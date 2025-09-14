@@ -188,7 +188,7 @@ class App:
         st.title("Streamlit Whisper")
         st.session_state["settings"] = self._sidebar_settings()
         self.settings = st.session_state.get("settings", {})
-        self.client = Client(self.settings["client"])
+        self.client = Client(self.settings["client"], self.settings["temperature"])
         self.stt = Whisper(self.settings["model"])
         audio_tab, upload_tab = st.tabs(["Audio", "Upload"])
         with audio_tab:

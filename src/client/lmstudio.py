@@ -7,11 +7,11 @@ class ClientLMStudio(Client):
     def __init__(self):
         self.config = Config().get_config()
         self.model = self.config["lmstudio"]["model"]
-        self.temperature = self.config["lmstudio"]["temperature"]
         self.client = OpenAI(
             api_key=self.config["lmstudio"]["api_key"],
             base_url=self.config["lmstudio"]["base_url"],
         )
+        self.temperature = self.temperature or self.config["lmstudio"]["temperature"]
 
     def chat(self, messages, stream=False):
         response = self.client.chat.completions.create(

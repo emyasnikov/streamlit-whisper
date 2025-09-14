@@ -2,7 +2,9 @@ from config import Config
 
 
 class Client:
-    def __init__(self, client=None):
+    temperature = None
+
+    def __init__(self, client=None, temperature=None):
         config = Config().get_config()
         client = client or config["client"]
         if client == "groq":
@@ -19,6 +21,7 @@ class Client:
             self.__class__ = ClientOpenAI
         else:
             raise ValueError(f"Invalid client: {client}")
+        self.temperature = temperature
         self.__init__()
 
     def chat(self, messages, stream=False):

@@ -10,13 +10,14 @@ class ClientGroq(Client):
             api_key=self.config["groq"]["api_key"],
             base_url=self.config["groq"]["base_url"],
         )
+        self.temperature = self.temperature or self.config["groq"]["temperature"]
 
     def chat(self, messages, stream=False):
         response = self.client.chat.completions.create(
             model=self.config["groq"]["model"],
             messages=messages,
             stream=stream,
-            temperature=self.config["groq"]["temperature"],
+            temperature=self.temperature,
         )
         if stream:
             for chunk in response:
