@@ -5,9 +5,9 @@ from config import Config
 
 
 class Whisper:
-    def __init__(self):
+    def __init__(self, model=None):
         self.config = Config().get_config()
-        self.model = whisper.load_model(self.config["model"])
+        self.model = whisper.load_model(model or self.config["model"])
 
     def temp_file(self, file):
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:

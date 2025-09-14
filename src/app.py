@@ -13,7 +13,6 @@ from stt import Whisper
 class App:
     def __init__(self):
         self.config = Config().get_config()
-        self.stt = Whisper()
         self.pyannote_pipeline = None
         self.speaker_map = None
         self.transcription = ""
@@ -82,10 +81,24 @@ class App:
                 "german",
             ].index(self.config["language"] or "german"),
         )
-        model = st.sidebar.text_input(
-            "Whisper Modell",
-            value=self.config["model"] or "base",
-        ),
+        model = st.sidebar.selectbox(
+            "Model",
+            [
+                "turbo",
+                "large",
+                "medium",
+                "small",
+                "base",
+                "tiny",
+            ], index=[
+                "turbo",
+                "large",
+                "medium",
+                "small",
+                "base",
+                "tiny",
+            ].index(self.config["model"] or "turbo"),
+        )
         speaker_recognition = st.sidebar.checkbox(
             "Speaker recognition",
             value=False,
@@ -166,6 +179,7 @@ class App:
         st.session_state["settings"] = self._sidebar_settings()
         self.settings = st.session_state.get("settings", {})
         self.client = Client(self.settings["client"])
+        self.stt = Whisper(self.settings["model"])
         audio_tab, upload_tab = st.tabs(["Audio", "Upload"])
         with audio_tab:
             self.input = st.audio_input("Record audio", label_visibility="hidden")
