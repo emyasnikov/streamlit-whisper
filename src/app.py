@@ -150,7 +150,7 @@ class App:
                             segment_audio.export(segment_path, format="wav")
                             with st.chat_message("user"):
                                 st.markdown(f"**{speaker}** - {turn.start:.1f}s")
-                                segment = self.stt.transcribe(segment_path)
+                                segment = self.stt.transcribe(segment_path, self.settings["language"])
                                 self.transcription += segment
                                 st.write(segment)
                             if os.path.exists(segment_path):
@@ -158,7 +158,7 @@ class App:
                 except Exception as e:
                     st.error(f"{e}")
         else:
-            self.transcription = self.stt.transcribe(self.input)
+            self.transcription = self.stt.transcribe(self.input, self.settings["language"])
             st.text_area(label="Transcript", value=self.transcription, label_visibility="collapsed")
 
     def run(self):
